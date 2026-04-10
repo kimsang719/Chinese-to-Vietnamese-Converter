@@ -1,1 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Dịch Thuật kimsang719</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --success-color: #16a34a;
+            --bg-color: #f8fafc;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: #1e293b;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #475569;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        .file-upload {
+            border: 2px dashed #cbd5e1;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            background: #f1f5f9;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .file-upload:hover {
+            border-color: var(--primary-color);
+        }
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-submit:hover {
+            opacity: 0.9;
+        }
+        .result-area {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff;
+            border-left: 6px solid var(--primary-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            white-space: pre-wrap;
+            font-size: 17px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
 
+    <div class="header">
+        <h1>Dịch Thuật Trung - Việt</h1>
+        <p>Hỗ trợ bảo vệ tên riêng thông minh bằng Regex</p>
+    </div>
+
+    <div class="container">
+        <form method="POST" enctype="multipart/form-data">
+
+            <div class="input-group">
+                <label>Cách 1: Tải file .txt lên</label>
+                <div class="file-upload" onclick="document.getElementById('file_input').click()">
+                    <p>Nhấn vào đây hoặc kéo thả file .txt</p>
+                    <input type="file" name="file_input" id="file_input" accept=".txt" style="display:none">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Cách 2: Dán văn bản tiếng Trung</label>
+                <textarea name="text_input" placeholder="Dán nội dung cần dịch vào đây...">{{ user_input }}</textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">Bắt đầu dịch ngay</button>
+        </form>
+
+        {% if result %}
+        <div class="result-area">
+            <h3 style="margin-top:0; color: var(--primary-color);">Kết quả dịch:</h3>
+            {{ result }}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        &copy; 2026 kimsang719 - Chạy trên nền tảng PythonAnywhere
+    </div>
+
+    <script>
+        // Hiển thị tên file khi đã chọn
+        document.getElementById('file_input').onchange = function() {
+            if(this.files.length > 0) {
+                document.querySelector('.file-upload p').innerText = "Đã chọn: " + this.files[0].name;
+                document.querySelector('.file-upload').style.borderColor = "#16a34a";
+            }
+        };
+    </script>
+</body>
+</html>
