@@ -5,14 +5,10 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-# --- SỬA ĐOẠN NÀY ĐỂ CHẠY TRÊN RENDER ---
-# Lấy đường dẫn thư mục hiện tại của file flask_app.py
+# --- CẤU HÌNH ĐƯỜNG DẪN CHO RENDER ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Đặt các file từ điển nằm cùng thư mục gốc với file .py
 DICTIONARY_FILE = os.path.join(BASE_DIR, "names.txt")
 HAN_VIET_FILE = os.path.join(BASE_DIR, "ChinesePhienAmWords.txt")
-# ---------------------------------------
 
 def load_dictionary(path):
     dic = {}
@@ -27,6 +23,10 @@ def load_dictionary(path):
         except Exception as e:
             print(f"Lỗi đọc từ điển tại {path}: {e}")
     return dic
+
+# Nạp từ điển ngay khi ứng dụng khởi động để tăng tốc độ dịch
+NAMES_DIC = load_dictionary(DICTIONARY_FILE)
+HAN_VIET_DIC = load_dictionary(HAN_VIET_FILE)
 
 def get_han_viet(text, han_viet_dic):
     res = []
@@ -59,7 +59,6 @@ def dich_thong_minh(text, dic, han_viet_dic):
 
         viet_raw = "".join([x[0] for x in res[0] if x[0]])
         if len(res[0]) > 1:
-            # Pinyin thường nằm ở cuối mảng dữ liệu trả về của Google
             pinyin_str = res[0][-1][3] if len(res[0][-1]) > 3 else ""
     except:
         viet_raw = temp_text
@@ -84,9 +83,6 @@ def index():
     result = ""
     user_input = ""
     if request.method == "POST":
-        dic = load_dictionary(DICTIONARY_FILE)
-        han_viet_dic = load_dictionary(HAN_VIET_FILE)
-
         if 'file_input' in request.files and request.files['file_input'].filename != '':
             user_input = request.files['file_input'].read().decode('utf-8-sig')
         else:
@@ -94,11 +90,19 @@ def index():
 
         if user_input.strip():
             lines = [line.strip().strip('\ufeff') for line in user_input.split('\n') if line.strip()]
-            results = [dich_thong_minh(line, dic, han_viet_dic) for line in lines]
+            # Sử dụng từ điển đã nạp sẵn
+            results = [dich_thong_minh(line, NAMES_DIC, HAN_VIET_DIC) for line in lines]
             result = "\n\n" + "═"*30 + "\n\n".join(results)
 
     return render_template("index.html", result=result, user_input=user_input)
 
-# Thêm dòng này để hỗ trợ Render nhận diện port nếu cần (không bắt buộc nhưng nên có)
+# --- CHÈN ROUTE CRON-TASK VÀO ĐÂY ---
+@app.route("/cron-task")
+def cron_task():
+    print("Ping nhận được! Server vẫn đang thức.")
+    return "OK", 200
+# -----------------------------------------------
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
